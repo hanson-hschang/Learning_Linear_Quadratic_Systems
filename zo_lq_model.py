@@ -34,7 +34,7 @@ class ZO_LQ_model:
         self.dL = self.x_dim * self.control_dim2 * self.H
 
         self.compact_A = torch.cat((torch.cat((torch.zeros((self.x_dim, self.x_dim * self.H)), torch.zeros(self.x_dim, self.x_dim)), dim=1), 
-                                    torch.cat((torch.block_diag(*self.A), torch.zeros((self.control_dim1 * self.H, self.x_dim))), dim=1)), dim=0)
+                                    torch.cat((torch.block_diag(*self.A), torch.zeros((self.x_dim * self.H, self.x_dim))), dim=1)), dim=0)
         # np.block([[torch.zeros((self.x_dim, self.x_dim * self.H)), torch.zeros(self.x_dim, self.x_dim)], 
                                 #    [torch.block_diag(*self.A), torch.zeros((self.control_dim1 * self.H, self.x_dim))]])
         self.B = model_params["B"]
@@ -291,7 +291,7 @@ class ZO_LQ_model:
         # compute product with the inverse of the covariance matrix, covariance at H is not needed
         est_cov = [torch.sum(covariance[h], axis=0) / self.M2 for h in range(self.H)] 
         est_ng_K = [self.dK / (self.M2 * self.r2) * torch.sum(perturbations[:, h, :, :], axis=0) @ torch.inverse(est_cov[h]) for h in range(self.H)]
-        print("est ng K: ", est_ng_K)
+        # print("est ng K: ", est_ng_K)
         # return type is a list of blocks
         return est_ng_K
 
@@ -342,7 +342,7 @@ class ZO_LQ_model:
         # compute product with the inverse of the covariance matrix, covariance at H is not needed
         est_cov = [torch.sum(covariance[h], axis=0) / self.M2 for h in range(self.H)] 
         est_ng_K = [self.dK / (self.M2 * self.r2) * torch.sum(perturbations[:, h, :, :], axis=0) @ torch.inverse(est_cov[h]) for h in range(self.H)]
-        print("est ng K: ", est_ng_K)
+        # print("est ng K: ", est_ng_K)
         # return type is a list of blocks
         return est_ng_K
 

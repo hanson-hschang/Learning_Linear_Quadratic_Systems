@@ -34,7 +34,7 @@ class ZO_LQ_model:
         self.dL = self.x_dim * self.control_dim2 * self.H
 
         self.compact_A = torch.cat((torch.cat((torch.zeros((self.x_dim, self.x_dim * self.H)), torch.zeros(self.x_dim, self.x_dim)), dim=1), 
-                                    torch.cat((torch.block_diag(*self.A), torch.zeros((self.control_dim1 * self.H, self.x_dim))), dim=1)), dim=0)
+                                    torch.cat((torch.block_diag(*self.A), torch.zeros((self.x_dim * self.H, self.x_dim))), dim=1)), dim=0)
         # np.block([[torch.zeros((self.x_dim, self.x_dim * self.H)), torch.zeros(self.x_dim, self.x_dim)], 
                                 #    [torch.block_diag(*self.A), torch.zeros((self.control_dim1 * self.H, self.x_dim))]])
         self.B = model_params["B"]

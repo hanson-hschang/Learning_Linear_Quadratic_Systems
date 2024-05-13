@@ -1,7 +1,7 @@
 import numpy as np
 import pickle 
 import os
-from rsa import sign
+# from rsa import sign
 import torch
 from matplotlib import pyplot as plt 
 from scipy import linalg
@@ -332,10 +332,10 @@ temp_algo_params = {
     "benchmark_algo": 0
 }
 
-# temp_algo_params["benchmark_algo"] = 0
-# res = Simulation(temp_model_params, temp_algo_params) 
-# temp_algo_params["benchmark_algo"] = 1
-# benchmark_res = Simulation(temp_model_params, temp_algo_params)  
+temp_algo_params["benchmark_algo"] = 0
+res = Simulation(temp_model_params, temp_algo_params) 
+temp_algo_params["benchmark_algo"] = 1
+benchmark_res = Simulation(temp_model_params, temp_algo_params)  
 
 memory_length = temp_algo_params["memory_length"]
 tau1 = temp_algo_params["tau1"]
