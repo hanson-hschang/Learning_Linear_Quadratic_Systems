@@ -14,37 +14,38 @@ signature  = str(memory_length) + "_" + str(tau1) + "_" + str(tau2) + "_" + str(
 
 initial_val_dir = "initial_values_set" + str(temp_algo_params["initial_values_index"]) + "/" 
 benchmark_initial_dir = "initial_values_set" + str(temp_algo_params["initial_values_index"]) + "/benchmark_algo/" 
+improved_initial_dir = "initial_values_set" + str(temp_algo_params["initial_values_index"]) + "/improved_algo/" 
 
 
 if temp_algo_params["exact_inner_loop"]:
-    # dir = initial_val_dir + "exact_inner_sol/"
+    # dir = improved_initial_dir + "exact_inner_sol/"
     if temp_algo_params["outer_loop_model_free"]:
-        dir = initial_val_dir + "exact_inner_sol/estimated_outer_grad/"
+        dir = improved_initial_dir + "exact_inner_sol/estimated_outer_grad/"
         benchmark_dir = benchmark_initial_dir + "exact_inner_sol/estimated_outer_grad/"
 
     else: 
-        dir = initial_val_dir + "exact_inner_sol/exact_outer_grad/"
+        dir = improved_initial_dir + "exact_inner_sol/exact_outer_grad/"
         benchmark_dir = benchmark_initial_dir + "exact_inner_sol/exact_outer_grad/"
 
 elif temp_algo_params["inner_loop_model_free"]:
-    # dir = initial_val_dir + "estimated_inner_grad/"
+    # dir = improved_initial_dir + "estimated_inner_grad/"
     if temp_algo_params["outer_loop_model_free"]:
-        dir = initial_val_dir + "estimated_inner_grad/estimated_outer_grad/"
+        dir = improved_initial_dir + "estimated_inner_grad/estimated_outer_grad/"
         benchmark_dir = benchmark_initial_dir + "estimated_inner_grad/estimated_outer_grad/"
     else: 
-        dir = initial_val_dir + "estimated_inner_grad/exact_outer_grad/"
+        dir = improved_initial_dir + "estimated_inner_grad/exact_outer_grad/"
         benchmark_dir = benchmark_initial_dir + "estimated_inner_grad/exact_outer_grad/"
 
 else: 
-    # dir = initial_val_dir + "exact_inner_grad/"
+    # dir = improved_initial_dir + "exact_inner_grad/"
     if temp_algo_params["outer_loop_model_free"]:
-        dir = initial_val_dir + "exact_inner_grad/estimated_outer_grad/"
+        dir = improved_initial_dir + "exact_inner_grad/estimated_outer_grad/"
         benchmark_dir = benchmark_initial_dir + "exact_inner_grad/estimated_outer_grad/"
     else: 
-        dir = initial_val_dir + "exact_inner_grad/exact_outer_grad/"
+        dir = improved_initial_dir + "exact_inner_grad/exact_outer_grad/"
         benchmark_dir = benchmark_initial_dir + "exact_inner_grad/estimated_outer_grad/"
 
-ind = 0
+ind = 5
 
 cost_list_filename = dir + "cost_list/" + signature + "_" + str(ind) + ".pk"
 cost_diff_filename = dir + "cost_diff_list/" + signature + "_" + str(ind) + ".pk"
@@ -57,9 +58,10 @@ benchmark_cost_diff_filename = benchmark_dir + "cost_diff_list/" + signature + "
 benchmark_lambda_list_filename = benchmark_dir + "lambda_list/" + signature + "_" + str(ind) + ".pk"
 benchmark_avg_ng_list_filename = benchmark_dir + "avg_ng_list/" + signature + "_" + str(ind) + ".pk"
 benchmark_KL_list_filename = benchmark_dir + "KL_list/" + signature + "_" + str(ind) + ".pk"
+benchmark_time_list_filename = benchmark_dir + "time_list/" + signature + "_" + str(ind) + ".pk"
 
-benchmark_cost_filename = "benchmarks/" + "cost.pk"
-benchmark_lambda_filename = "benchmarks/" + "lambda.pk"
+nash_cost_filename = "nash/" + "cost.pk"
+nash_lambda_filename = "nash/" + "lambda.pk"
 
 # cost_list_file = open(cost_list_filename, "rb")
 # cost_diff_file = open(cost_diff_filename, "rb")
@@ -71,9 +73,10 @@ benchmark_cost_diff_file = open(benchmark_cost_diff_filename, "rb")
 benchmark_lambda_list_file = open(benchmark_lambda_list_filename, "rb")
 benchmark_avg_ng_list_file = open(benchmark_avg_ng_list_filename, "rb")
 benchmark_KL_list_file = open(benchmark_KL_list_filename, "rb")
+benchmark_time_list_file = open(benchmark_time_list_filename, "rb")
 
-benchmark_cost_file = open(benchmark_cost_filename, "rb")
-benchmark_lambda_file = open(benchmark_lambda_filename, "rb")
+nash_cost_file = open(nash_cost_filename, "rb")
+nash_lambda_file = open(nash_lambda_filename, "rb")
 
 # temp_cost_list = pickle.load(cost_list_file)
 # temp_cost_diff_list = pickle.load(cost_diff_file)
@@ -85,37 +88,51 @@ benchmark_cost_diff_list = pickle.load(benchmark_cost_diff_file)
 benchmark_lambda_list = pickle.load(benchmark_lambda_list_file)
 benchmark_avg_ng_list = pickle.load(benchmark_avg_ng_list_file)
 benchmark_KL_list = pickle.load(benchmark_KL_list_file)
+benchmark_time_list = pickle.load(benchmark_time_list_file)
 
-nash_cost = pickle.load(benchmark_cost_file)
-nash_lambda = pickle.load(benchmark_lambda_file)
+nash_cost = pickle.load(nash_cost_file)
+nash_lambda = pickle.load(nash_lambda_file)
 
 benchmark_K_list = benchmark_KL_list["K_list"]
 benchmark_L_list = benchmark_KL_list["L_list"]
+benchmark_time = np.array(benchmark_time_list)
+benchmark_time = benchmark_time-benchmark_time[0]
 
 from riccati_equation import Riccati
 riccati = Riccati(temp_model_params)
 matrix_K_time_trajectory = riccati.get_gain_K_time_trajectory()
+for x in benchmark_cost_list:
+    print(x)
 
 # Already plotted the linear convergence part
 plt.rcParams['text.usetex'] = True
 # plot linear convergence
 
-fig = plt.figure()
-axes = fig.subplots(riccati.u_dim, riccati.x_dim)
-for iter_number in range(memory_length):
-    if (iter_number + 1) % int(memory_length/4) == 0 or iter_number == 0:
-        K_list_at_iter_number = np.zeros((horizon_length, temp_model_params['control_dim1'], temp_model_params['x_dim']))
-        for time_step in range(horizon_length):
-            K_list_at_iter_number[time_step] = benchmark_K_list[iter_number][time_step].numpy()
-        # print(K_list_at_iter_number)
-        for i in range(riccati.u_dim):
-            for j in range(riccati.x_dim):
-                axes[i, j].plot(K_list_at_iter_number[:, i, j], linestyle='--', label='iter no. :'+str(iter_number+1))
+# fig = plt.figure()
+# axes = fig.subplots(riccati.u_dim, riccati.x_dim)
+# for iter_number in range(memory_length):
+#     if (iter_number + 1) % int(memory_length/4) == 0 or iter_number == 0:
+#         K_list_at_iter_number = np.zeros((horizon_length, temp_model_params['control_dim1'], temp_model_params['x_dim']))
+#         for time_step in range(horizon_length):
+#             K_list_at_iter_number[time_step] = benchmark_K_list[iter_number][time_step].numpy()
+#         # print(K_list_at_iter_number)
+#         for i in range(riccati.u_dim):
+#             for j in range(riccati.x_dim):
+#                 axes[i, j].plot(K_list_at_iter_number[:, i, j], linestyle='--', label='iter no. :'+str(iter_number+1))
 
-for i in range(riccati.u_dim):
-    for j in range(riccati.x_dim):
-        axes[i, j].plot(matrix_K_time_trajectory[:, i, j], color='black', label='Riccati' )
+# for i in range(riccati.u_dim):
+#     for j in range(riccati.x_dim):
+#         axes[i, j].plot(matrix_K_time_trajectory[:, i, j], color='black', label='Riccati' )
     
-axes[0, 1].legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), ncol=6)
+# axes[0, 1].legend(loc='lower center', bbox_to_anchor=(0.5, 1.05), ncol=6)
+
+fig = plt.figure()
+ax = fig.subplots(1, 1)
+ax.plot(
+    [((x - nash_cost)/nash_cost).numpy() for x in benchmark_cost_list],
+    benchmark_time
+)
+ax.set_xlabel("error")
+ax.set_ylabel("time [sec]")
 
 plt.show()

@@ -58,8 +58,8 @@ benchmark_cost_diff_filename = benchmark_dir + "cost_diff_list/" + signature + "
 benchmark_lambda_list_filename = benchmark_dir + "lambda_list/" + signature + "_" + str(ind) + ".pk"
 benchmark_avg_ng_list_filename = benchmark_dir + "avg_ng_list/" + signature + "_" + str(ind) + ".pk"
 
-benchmark_cost_filename = "benchmarks/" + "cost.pk"
-benchmark_lambda_filename = "benchmarks/" + "lambda.pk"
+nash_cost_filename = "nash/" + "cost.pk"
+nash_lambda_filename = "nash/" + "lambda.pk"
 
 cost_list_file = open(cost_list_filename, "rb")
 cost_diff_file = open(cost_diff_filename, "rb")
@@ -71,8 +71,8 @@ benchmark_cost_diff_file = open(benchmark_cost_diff_filename, "rb")
 benchmark_lambda_list_file = open(benchmark_lambda_list_filename, "rb")
 benchmark_avg_ng_list_file = open(benchmark_avg_ng_list_filename, "rb")
 
-benchmark_cost_file = open(benchmark_cost_filename, "rb")
-benchmark_lambda_file = open(benchmark_lambda_filename, "rb")
+benchmark_cost_file = open(nash_cost_filename, "rb")
+benchmark_lambda_file = open(nash_lambda_filename, "rb")
 
 temp_cost_list = pickle.load(cost_list_file)
 temp_cost_diff_list = pickle.load(cost_diff_file)
