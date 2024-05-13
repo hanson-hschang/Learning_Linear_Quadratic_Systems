@@ -1,5 +1,5 @@
 from sim_parameters import *
-
+import time
 import logging
 logging.basicConfig(
     level=logging.DEBUG, 
@@ -35,6 +35,7 @@ def Simulation(model_params, algo_params):
 
     K_list = [np.nan for _ in range(memory_length)]
     L_list = [np.nan for _ in range(memory_length)]
+    time_list= [np.nan for _ in range(memory_length)]
 
     # we also record the convergence measure - average of the gradient, only for the outer-loop iterations
     avg_ng_list = [np.nan for _ in range(memory_length)]
@@ -86,6 +87,7 @@ def Simulation(model_params, algo_params):
 
     # for t_out in range(T_outer):
     # print("memory length: ", memory_length)
+    time_list[0] = time.time()
     while avg_ng_list[outer_loop_iter_num] > model.epsilon2 and iter_num < memory_length-1:
         # for t_in in range(T_inner):
         
@@ -126,6 +128,7 @@ def Simulation(model_params, algo_params):
             lambda_list[iter_num] = model.compute_lambda(K, L)
             K_list[iter_num] = K.copy()
             L_list[iter_num] = L.copy()
+            time_list[iter_num] = time.time()
 
         # now L is the estimated inner-loop solution given K
         if outer_loop_model_free:
@@ -150,6 +153,7 @@ def Simulation(model_params, algo_params):
         lambda_list[iter_num] = model.compute_lambda(K, L)
         K_list[iter_num] = K.copy()
         L_list[iter_num] = L.copy()
+        time_list[iter_num] = time.time()
 
         avg_ng_list[outer_loop_iter_num] = model.compute_avg_ng(K, outer_loop_iter_num+1, avg_ng_list[outer_loop_iter_num-1])
         logging.debug("outer loop cost: " + str(iter_num) + ": " + str(cost_list[iter_num]))
@@ -209,6 +213,7 @@ def Simulation(model_params, algo_params):
     avg_ng_list_filename = dir + "/avg_ng_list/" + signature + "_" + str(ind) + ".pk"
     cost_diff_list_filename = dir + "/cost_diff_list/" + signature + "_" + str(ind) + ".pk"
     KL_list_filename = dir + "/KL_list/" + signature + "_" + str(ind) + ".pk"
+    time_list_filename = dir + "/time_list/" + signature + "_" + str(ind) + ".pk"
 
     if not os.path.isdir(dir + "/cost_list/"):
         os.mkdir(dir + "/cost_list/")
@@ -220,6 +225,8 @@ def Simulation(model_params, algo_params):
         os.mkdir(dir + "/avg_ng_list/")
     if not os.path.isdir(dir + "/KL_list/"):
         os.mkdir(dir + "/KL_list/")
+    if not os.path.isdir(dir + "/time_list/"):
+        os.mkdir(dir + "/time_list/")
 
 
     cost_file = open(cost_list_filename, "wb+")
@@ -227,6 +234,7 @@ def Simulation(model_params, algo_params):
     lambda_file = open(lambda_list_filename, "wb+")
     avg_ng_file = open(avg_ng_list_filename, "wb+")
     KL_file = open(KL_list_filename, "wb+")
+    time_file = open(time_list_filename, "wb+")
 
     pickle.dump(cost_list, cost_file)
     pickle.dump(cost_diff_list, cost_diff_file)
@@ -239,12 +247,11 @@ def Simulation(model_params, algo_params):
         ),
         KL_file
     )
+    pickle.dump(time_list, time_file)
     logging.debug("debug cost list: " + str(cost_list))
 
-
-
 print("runnning sims ...")
-temp_algo_params["benchmark_algo"] = 0
-res = Simulation(temp_model_params, temp_algo_params) 
-# temp_algo_params["benchmark_algo"] = 1
-# benchmark_res = Simulation(temp_model_params, temp_algo_params)
+# temp_algo_params["benchmark_algo"] = 0
+# res = Simulation(temp_model_params, temp_algo_params) 
+temp_algo_params["benchmark_algo"] = 1
+benchmark_res = Simulation(temp_model_params, temp_algo_params)

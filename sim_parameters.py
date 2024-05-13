@@ -117,7 +117,7 @@ temp_algo_params = {
     # "memory_length": int(sys.argv[14]),
     # "memory_length": 2000,
     # 10 is for debugging
-    "memory_length": 2000,
+    "memory_length": 10,
     # "benchmark_algo": int(sys.argv[15]),
     "benchmark_algo": 0
 }
