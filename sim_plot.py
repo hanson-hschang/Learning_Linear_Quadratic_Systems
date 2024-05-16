@@ -61,10 +61,10 @@ benchmark_avg_ng_list_filename = benchmark_dir + "avg_ng_list/" + signature + "_
 nash_cost_filename = "nash/" + "cost.pk"
 nash_lambda_filename = "nash/" + "lambda.pk"
 
-cost_list_file = open(cost_list_filename, "rb")
-cost_diff_file = open(cost_diff_filename, "rb")
-lambda_list_file = open(lambda_list_filename, "rb")
-avg_ng_list_file = open(avg_ng_list_filename, "rb")
+# cost_list_file = open(cost_list_filename, "rb")
+# cost_diff_file = open(cost_diff_filename, "rb")
+# lambda_list_file = open(lambda_list_filename, "rb")
+# avg_ng_list_file = open(avg_ng_list_filename, "rb")
 
 benchmark_cost_list_file = open(benchmark_cost_list_filename, "rb")
 benchmark_cost_diff_file = open(benchmark_cost_diff_filename, "rb")
@@ -74,10 +74,10 @@ benchmark_avg_ng_list_file = open(benchmark_avg_ng_list_filename, "rb")
 benchmark_cost_file = open(nash_cost_filename, "rb")
 benchmark_lambda_file = open(nash_lambda_filename, "rb")
 
-temp_cost_list = pickle.load(cost_list_file)
-temp_cost_diff_list = pickle.load(cost_diff_file)
-temp_lambda_list = pickle.load(lambda_list_file)
-temp_avg_ng_list = pickle.load(avg_ng_list_file)
+# temp_cost_list = pickle.load(cost_list_file)
+# temp_cost_diff_list = pickle.load(cost_diff_file)
+# temp_lambda_list = pickle.load(lambda_list_file)
+# temp_avg_ng_list = pickle.load(avg_ng_list_file)
 
 benchmark_cost_list = pickle.load(benchmark_cost_list_file)
 benchmark_cost_diff_list = pickle.load(benchmark_cost_diff_file)
@@ -94,7 +94,7 @@ plt.rcParams['text.usetex'] = True
 # plot linear convergence
 plt.figure()
 if compare_plot:
-    plt.plot(temp_cost_diff_list, label="Our algo")
+    # plt.plot(temp_cost_diff_list, label="Our algo")
     plt.plot(benchmark_cost_diff_list, linestyle='--', label="Benchmark algo")
     plt.yscale('log')
     plt.xlabel('Outer-loop iterations $t$', fontsize=18)
@@ -106,7 +106,7 @@ if compare_plot:
     plt.savefig(dir + signature + "/compare_cost_diff.pdf")
     
 else: 
-    plt.plot(temp_cost_diff_list, label='Our algo')
+    # plt.plot(temp_cost_diff_list, label='Our algo')
     plt.yscale('log')
     plt.xlabel('Outer-loop iterations $t$', fontsize=18)
     plt.ylabel(r'$\mathcal{G}(\mathbf{K}_t,\mathbf{L}(\mathbf{K}_t))-\mathcal{G}(\mathbf{K}^*,\mathbf{L}^*)$', fontsize=18)
@@ -124,7 +124,7 @@ else:
 plt.figure()
 if compare_plot:
 
-    plt.plot([x - nash_cost for x in temp_cost_list], label="Our algo")
+    # plt.plot([x - nash_cost for x in temp_cost_list], label="Our algo")
     plt.plot([x - nash_cost for x in benchmark_cost_list], linestyle='--', label="Benchmark algo")
     # plt.axhline(y=nash_cost, linestyle='--', label=r'$\mathcal{G}(\mathbf{K}^*,\mathbf{L}^*)$')
     plt.yscale('log')
@@ -137,7 +137,7 @@ if compare_plot:
     plt.savefig(dir + signature + "/compare_cost.pdf")
 else:
 
-    plt.plot(temp_cost_list, label='Our algorithm')
+    # plt.plot(temp_cost_list, label='Our algorithm')
     # plt.axhline(y=nash_cost, linestyle='--', label=r'$\mathcal{G}(\mathbf{K}^*,\mathbf{L}^*)$')
     plt.xlabel(r'Total iterations of $(\mathbf{K}_t,\mathbf{L}_k)$', fontsize=18)
     plt.ylabel(r'$\mathcal{G}(\mathbf{K}_t,\mathbf{L}_k)-\mathcal{G}(\mathbf{K}^*,\mathbf{L}^*)$', fontsize=18)
@@ -154,7 +154,7 @@ else:
 plt.figure()
 if compare_plot:
 
-    plt.plot([nash_lambda - x for x in temp_lambda_list], label="Our algo")
+    # plt.plot([nash_lambda - x for x in temp_lambda_list], label="Our algo")
     plt.plot([nash_lambda - x for x in benchmark_lambda_list], linestyle='--', label="Benchmark algo")
     # plt.axhline(y=nash_lambda, linestyle='--', label=r'$\lambda_{\min}(\mathbf{H}_{\mathbf{K}^*,\mathbf{L}^*})$')
     plt.xlabel(r'Total iterations of $(\mathbf{K}_t,\mathbf{L}_k)$', fontsize=18)
@@ -167,7 +167,7 @@ if compare_plot:
 
 else: 
 
-    plt.plot(nash_lambda - temp_lambda_list, label='Our algorithm')
+    # plt.plot(nash_lambda - temp_lambda_list, label='Our algorithm')
     # plt.axhline(y=nash_lambda, linestyle='--', label=r'$\lambda_{\min}(\mathbf{H}_{\mathbf{K}^*,\mathbf{L}^*})$')
 
     plt.xlabel(r'Total iterations of $(\mathbf{K}_t,\mathbf{L}_k)$')
@@ -185,7 +185,7 @@ plt.figure()
 plt.yscale('log')
 if compare_plot:
 
-    plt.plot(temp_avg_ng_list, label="Our algo")
+    # plt.plot(temp_avg_ng_list, label="Our algo")
     plt.plot(benchmark_avg_ng_list, linestyle='--', label="Benchmark algo")
     plt.legend()
     plt.xlabel(r'Outer-loop iterations $t$', fontsize=18)
@@ -194,7 +194,7 @@ if compare_plot:
     plt.savefig(dir + signature + "/compare_avg_ng_norm.pdf")
 else: 
 
-    plt.plot(temp_avg_ng_list)
+    # plt.plot(temp_avg_ng_list)
     plt.xlabel(r'Outer-loop iterations $t$', fontsize=18)
     plt.ylabel('Average natural gradient norm', fontsize=18)
     # plt.legend(ncol=1, loc='upper right')

@@ -1,13 +1,7 @@
 from sim_parameters import *
 import time
 import logging
-logging.basicConfig(
-    level=logging.DEBUG, 
-    filename="sim_run.log", 
-    filemode="w",
-    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-)
+import random
 
 def Simulation(model_params, algo_params):
     logging.info("Start simulation with benchmark_algo = " + str(temp_algo_params["benchmark_algo"] ))
@@ -56,21 +50,21 @@ def Simulation(model_params, algo_params):
         os.mkdir(initial_val_dir)
 
     # nash is irrelevant to the initial values
-    if not os.path.isdir("nash/"):
-        os.mkdir("nash/")
+    # if not os.path.isdir("nash/"):
+    #     os.mkdir("nash/")
 
-    nash_K_filename = "nash/K.pk"
-    nash_K_file = open(nash_K_filename, "wb+")
-    pickle.dump(model.nash_K, nash_K_file)
-    nash_L_filename = "nash/L.pk"
-    nash_L_file = open(nash_L_filename, "wb+")
-    pickle.dump(model.nash_L, nash_L_file)
-    nash_cost_filename = "nash/cost.pk"
-    nash_cost_file = open(nash_cost_filename, "wb+")
-    pickle.dump(model.nash_cost, nash_cost_file)
-    nash_lambda_filename = "nash/lambda.pk"
-    nash_lambda_file = open(nash_lambda_filename, "wb+")
-    pickle.dump(model.nash_lambda, nash_lambda_file)
+    # nash_K_filename = "nash/K.pk"
+    # nash_K_file = open(nash_K_filename, "wb+")
+    # pickle.dump(model.nash_K, nash_K_file)
+    # nash_L_filename = "nash/L.pk"
+    # nash_L_file = open(nash_L_filename, "wb+")
+    # pickle.dump(model.nash_L, nash_L_file)
+    # nash_cost_filename = "nash/cost.pk"
+    # nash_cost_file = open(nash_cost_filename, "wb+")
+    # pickle.dump(model.nash_cost, nash_cost_file)
+    # nash_lambda_filename = "nash/lambda.pk"
+    # nash_lambda_file = open(nash_lambda_filename, "wb+")
+    # pickle.dump(model.nash_lambda, nash_lambda_file)
 
 
     logging.info("Start computing ...")
@@ -207,6 +201,7 @@ def Simulation(model_params, algo_params):
         ind += 1
         cost_list_filename = dir + "/cost_list/" + signature + "_" + str(ind) + ".pk"
     print("signatrue_ind: " + signature + "_" + str(ind))
+    logging.info("signatrue_ind: " + signature + "_" + str(ind))
 
 
     lambda_list_filename = dir + "/lambda_list/" + signature + "_" + str(ind) + ".pk"
@@ -254,4 +249,18 @@ print("runnning sims ...")
 # temp_algo_params["benchmark_algo"] = 0
 # res = Simulation(temp_model_params, temp_algo_params) 
 temp_algo_params["benchmark_algo"] = 1
-benchmark_res = Simulation(temp_model_params, temp_algo_params)
+for i in range(5):
+    print("running simulation " + str(i+1))
+     
+    logging.basicConfig(
+        level=logging.DEBUG, 
+        filename="sim_run_" + str(i+1) +".log", 
+        filemode="w",
+        format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+    )
+    seed = (i+310)*2
+    random.seed(seed)
+    logging.info("running simulation " + str(i+1) + " with seed = " + str(seed))
+    benchmark_res = Simulation(temp_model_params, temp_algo_params)
+    # 3, 9, 15, 942, 620
