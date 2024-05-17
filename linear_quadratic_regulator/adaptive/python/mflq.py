@@ -125,7 +125,7 @@ class MFLQStrategy(AdaptiveMethod):
         Hhat_proj = utils.psd_project(utils.smat(hhat) - self._Q, 0, np.inf) + self._Q
         hhat_proj = utils.svec(Hhat_proj)
 
-        ghat = scipy.linalg.solve(Psis.T @ Psis, Psis.T @ (costs + (Phis_plus - W) @ hhat_proj), sym_pos=True)
+        ghat = scipy.linalg.solve(Psis.T @ Psis, Psis.T @ (costs + (Phis_plus - W) @ hhat_proj), assume_a='pos')
         cost_block = np.block([[self._Q, np.zeros([self._Q.shape[0], self._R.shape[1]])],
                                [np.zeros([self._Q.shape[1], self._R.shape[0]]), self._R]])
         Ghat = utils.psd_project(utils.smat(ghat) - cost_block, 0, np.inf) + cost_block

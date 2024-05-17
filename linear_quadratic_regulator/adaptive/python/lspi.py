@@ -103,7 +103,7 @@ class LSPIStrategy(AdaptiveMethod):
         for i in range(num_iters):
             Qt = self._lstdq(self._Phis, transitions, self._costs, self._Kt,
                              self._sigma_w, self._mu, self._L)
-            Ktp1 = -scipy.linalg.solve(Qt[n:, n:], Qt[:n, n:].T, sym_pos=True)
+            Ktp1 = -scipy.linalg.solve(Qt[n:, n:], Qt[:n, n:].T, assume_a='pos')
             self._Kt = Ktp1
 
         rho_true = utils.spectral_radius(self._A_star + self._B_star @ self._Kt)
@@ -131,7 +131,7 @@ class LSPIStrategy(AdaptiveMethod):
         if min(svals) <= 1e-8:
             raise RankDegeneracyException(
                 "Amat is degenerate: s_min(Amat)={}".format(min(svals)))
-        qhat = np.linalg.lstsq(Amat, bmat)[0]
+        qhat = np.linalg.lstsq(Amat, bmat, rcond=None)[0]
         Qhat = utils.psd_project(utils.smat(qhat), mu, L)
         return Qhat
 

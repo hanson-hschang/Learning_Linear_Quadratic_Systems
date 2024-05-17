@@ -76,7 +76,7 @@ def dlqr(A,B,Q=None,R=None):
         R = np.eye(B.shape[1])
 
     P = scipy.linalg.solve_discrete_are(A, B, Q, R)
-    K = -scipy.linalg.solve(B.T.dot(P).dot(B) + R, B.T.dot(P).dot(A), sym_pos=True)
+    K = -scipy.linalg.solve(B.T.dot(P).dot(B) + R, B.T.dot(P).dot(A), assume_a="pos")
 
     A_c = A + B.dot(K)
     TOL = 1e-5
@@ -163,7 +163,7 @@ def solve_least_squares(states, inputs, transitions, reg=0):
     Cov = X.T.dot(X) + regI
 
     # (n+p) x n
-    Theta_hat = scipy.linalg.solve(Cov, X.T.dot(Y), sym_pos=True)
+    Theta_hat = scipy.linalg.solve(Cov, X.T.dot(Y), assume_a='pos')
     # n x (n+p)
     Theta_hat = Theta_hat.T
 
