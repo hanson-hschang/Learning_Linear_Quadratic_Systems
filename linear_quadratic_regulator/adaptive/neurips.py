@@ -304,8 +304,20 @@ for ind, (cost_iterations, Kt_iterations, time_iterations) in enumerate(zip(cost
     # print(time_iterations.shape)
 
     K_error_iterations = calculate_K_error(Kt_iterations, K_inf)
-    cost_iterations = np.insert(cost_iterations, 0, np.nan)
+    cost_iterations = np.insert(cost_iterations, 0, np.inf)
     time_iterations = time_iterations - time_iterations[0]
+
+    min_K_error = K_error_iterations[0]
+    min_cost = cost_iterations[0]
+    for i in range(1, len(time_iterations)):
+        if K_error_iterations[i] < min_K_error:
+            min_K_error = K_error_iterations[i]
+        else:
+            K_error_iterations[i] = min_K_error
+        if cost_iterations[i] < min_cost:
+            min_cost = cost_iterations[i]
+        else:
+            cost_iterations[i] = min_cost
 
     gain_K_ax.plot(
         K_error_iterations[1:],
@@ -325,8 +337,8 @@ for ind, (cost_iterations, Kt_iterations, time_iterations) in enumerate(zip(cost
     pickle.dump(
         dict(
             benchmark_time=time_iterations,
-            benchmark_K_error=K_error_iterations,
-            benchmark_normalized_cost=time_iterations
+            benchmark_normalized_K_error=K_error_iterations,
+            benchmark_normalized_cost=cost_iterations
         ), 
         data_file
     )
