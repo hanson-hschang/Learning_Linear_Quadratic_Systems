@@ -259,8 +259,9 @@ for i in range(5):
         format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
     )
-    seed = (i+310)*2
+    seed = 22
     random.seed(seed)
     logging.info("running simulation " + str(i+1) + " with seed = " + str(seed))
     benchmark_res = Simulation(temp_model_params, temp_algo_params)
     # 3, 9, 15, 942, 620
+    # aaj: 2
