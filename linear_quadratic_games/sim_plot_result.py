@@ -8,7 +8,7 @@ def matrix_norm(matrix):
 
 def calculate_gain_error(gain, gain_star):
     cost = matrix_norm(gain-gain_star) / matrix_norm(gain_star)
-    return np.sum(cost) / horizon_length
+    return np.mean(cost)
 
 def read_K(K_list):
     K_array = np.zeros((horizon_length, temp_model_params["control_dim1"], temp_model_params["x_dim"]))

@@ -124,7 +124,7 @@ for ind in ind_list:
     pickle.dump(
         dict(
             benchmark_time=benchmark_time,
-            benchmark_K_error=benchmark_K_error_list,
+            benchmark_normalized_K_error=benchmark_K_error_list,
             benchmark_normalized_cost=benchmark_normalized_cost_list,
         ),
         neuirps_data_file
