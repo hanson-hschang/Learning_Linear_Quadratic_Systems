@@ -33,18 +33,14 @@ from ts import TSStrategy
 from lspi import LSPIStrategy
 from mflq import MFLQStrategy
 
-# logging.basicConfig(level=logging.CRITICAL)
-logging.basicConfig(
-    level=logging.DEBUG, 
-    filename="regret_comparison.log", 
-    filemode="w",
-    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-)
-
-bigfont = 18
-medfont = 14
-smallfont = 18
+logging.basicConfig(level=logging.CRITICAL)
+# logging.basicConfig(
+#     level=logging.DEBUG, 
+#     filename="regret_comparison.log", 
+#     filemode="w",
+#     format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+#     datefmt='%Y-%m-%d %H:%M:%S',
+# )
 
 # PARAMETERS
 rng = np.random
@@ -71,23 +67,6 @@ def unstable_dynamics(qr_ratio=1e1, prime_horizon=250, prime_excitation=2):
 
 example = laplacian_dynamics() # unstable_dynamics()
 A_star, B_star, K_init, Q, R, prime_horizon, prime_excitation, sigma_excitation, sigma_w = example
-
-
-print("\n A")
-print(A_star)
-print("\n B")
-print(B_star)
-print("\n K_inf")
-print(K_init)
-print("\n Q")
-print(Q)
-print("\n R")
-print(R)
-print("\n")
-print("prime_horizon", prime_horizon)
-print("prime_excitation", prime_excitation)
-print("sigma_excitation", sigma_excitation)
-
 
 prime_horizon = 2000
 def optimal_ctor():
@@ -180,50 +159,6 @@ def run_one_trial(new_env_ctor, seed, prime_fixed=False):
     env.complete_epoch(rng)
     err, cost = env.get_statistics(iteration_based=True)
     return regret, err, cost
-
-# def spawn_invocation(method, p, prime_fixed=False):
-#     seed = np.random.randint(0xFFFFFFFF)
-#     ctor = {
-#         'optimal': optimal_ctor,
-#         'nominal': nominal_ctor,
-#         'ofu': ofu_ctor,
-#         'ts': ts_ctor,
-#         'sls_fir': sls_fir_ctor,
-#         'sls_cl': sls_cl_ctor,
-#         'lspi': lspi_ctor,
-#         'mflq': mflq_ctor,
-#         'LSPI': lspi_ctor,
-#         'MFLQ': mflq_ctor,
-#     }[method]
-#     return (p.apply_async(run_one_trial, (ctor, seed, prime_fixed)), seed)
-
-# def process_future_list(ftchs):
-#     regrets = []
-#     errors = []
-#     costs = []
-#     seeds = []
-#     bad_invocations = 0
-#     for ftch, seed in ftchs:
-#         try:
-#             print("hi_outside")
-#             reg, err, cost = ftch.get()
-#         except Exception as e:
-#             traceback.print_exc()
-#             bad_invocations += 1
-#             continue
-#         regrets.append(reg)
-#         errors.append(err)
-#         costs.append(cost)
-#         seeds.append(seed)
-#     return np.array(regrets), np.array(errors), np.array(costs), np.array(seeds), bad_invocations
-
-# strategies = ['optimal', 'nominal', 'LSPI', 'MFLQ']
-# start_time = time.time()
-# with Pool(processes=cpu_count()) as p:
-#     all_futures = [[spawn_invocation(method, p, prime_fixed=True) 
-#                     for _ in range(trials_per_method)] for method in strategies]
-#     list_of_results = [process_future_list(ftchs) for ftchs in all_futures] 
-# print("finished execution in {} seconds".format(time.time() - start_time))
 
 ctor = {
     'optimal': optimal_ctor,

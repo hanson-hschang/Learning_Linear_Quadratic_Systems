@@ -121,7 +121,7 @@ class MFLQStrategy(AdaptiveMethod):
         W = utils.svec(np.eye(n) * sigma_w ** 2)
         Amat = Phis.T @ (Phis - Phis_plus + W)
         bmat = Phis.T @ costs
-        hhat = np.linalg.lstsq(Amat, bmat)[0]
+        hhat = np.linalg.lstsq(Amat, bmat, rcond=None)[0]
         Hhat_proj = utils.psd_project(utils.smat(hhat) - self._Q, 0, np.inf) + self._Q
         hhat_proj = utils.svec(Hhat_proj)
 
