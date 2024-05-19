@@ -68,7 +68,7 @@ gain_K_ax = gain_K_fig.subplots(1, 1)
 cost_fig = plt.figure()
 cost_ax = cost_fig.subplots(1,1)
 
-ind_list = np.arange(5)
+ind_list = np.arange(6)
 
 neuirps_data_folder_directory = "neurips_data/"
 if not os.path.isdir(neuirps_data_folder_directory):
