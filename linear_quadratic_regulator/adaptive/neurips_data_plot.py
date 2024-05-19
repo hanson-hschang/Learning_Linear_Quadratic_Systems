@@ -1,11 +1,7 @@
 import os
 import pickle
-from pydoc import doc
-from tkinter import font
-from turtle import color
 import numpy as np
 import matplotlib.pyplot as plt
-from collections import defaultdict
 from typing import Literal
 
 class Data:
