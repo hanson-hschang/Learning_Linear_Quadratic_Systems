@@ -50,7 +50,7 @@ smallfont = 18
 
 # PARAMETERS
 rng = np.random
-horizon = 10000
+horizon = 100000
 trials_per_method = 100
 
 def set_up_example(A_star, B_star, qr_ratio, prime_horizon, prime_excitation, sigma_excitation=0.1):

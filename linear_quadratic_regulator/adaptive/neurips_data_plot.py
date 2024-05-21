@@ -31,7 +31,7 @@ class Data:
     def get_standard_deviation_time(
         self,
         value: np.ndarray,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         interpolated_time = self.get_interpolated_time(value)
         time_average = np.mean(interpolated_time, axis=0)
         time_std = np.std(interpolated_time, axis=0)
@@ -112,7 +112,7 @@ class DataPlot:
         time: np.ndarray,
         **kwargs
     ) -> None:
-        kwargs.setdefault("color", self.kwargs_plots['line_color'])
+        # kwargs.setdefault("color", self.kwargs_plots['line_color'])
         self.axes.plot(value, time, **kwargs)
 
     def plot_error_bar(
@@ -122,7 +122,7 @@ class DataPlot:
         time_std: np.ndarray,
         **kwargs
     ) -> None:
-        kwargs.setdefault("color", self.kwargs_plots['marker_color'])
+        # kwargs.setdefault("color", self.kwargs_plots['marker_color'])
         self.axes.errorbar(value, time, yerr=time_std, **kwargs)
     
     def plot_error_cross(
@@ -151,33 +151,6 @@ class DataPlot:
         self.axes.legend(fontsize=self.kwargs_plots['fontsize'])
 
 def main():
-    """
-    Main function for plotting NeurIPS data.
-
-    This function retrieves data from the dataset, performs calculations, and plots the results.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-
-    # Load data
-    neurips_data_directory_name = "neurips_data/"
-    raw_data = RawData(directory_name=neurips_data_directory_name)
-
-    # Process data
-    data_K_error = raw_data.get_data(key="K_error", reverse=True)
-    K_error, time_K_error = data_K_error.get_average_time_curve(num=50)
-    markers_K_error = np.linspace(K_error[0], K_error[-1], num=7)[1:-1]
-    time_at_markers_K_error, time_std_at_markers_K_error = data_K_error.get_standard_deviation_time(markers_K_error)
-
-    data_cost = raw_data.get_data(key="cost", reverse=True)
-    cost, time_cost = data_cost.get_average_time_curve(num=50)
-    markers_cost = np.linspace(cost[0], cost[-1], num=7)[1:-1]
-    time_at_markers_cost, time_std_at_markers_cost = data_cost.get_standard_deviation_time(markers_cost)
-
 
     # Plots settings
     kwargs_figure = {"figsize": (8, 6)}
@@ -189,79 +162,75 @@ def main():
         "marker_color": "#874F8D",
     }
 
-    # Plotting data K_error
     data_plot_K_error = DataPlot(
         kwargs_figure=kwargs_figure, 
         kwargs_axes=kwargs_axes,
         kwargs_plots=kwargs_plots
     )
-    data_plot_K_error.plot_average_time_curve(
-        K_error,
-        time_K_error,
-        label='benchmark'
+    data_plot_cost = DataPlot(
+        kwargs_figure=kwargs_figure, 
+        kwargs_axes=kwargs_axes,
+        kwargs_plots=kwargs_plots
     )
-    data_plot_K_error.plot_error_bar(
-        markers_K_error,
-        time_at_markers_K_error,
-        time_std_at_markers_K_error,
-        fmt="o",
-        markersize=5,
-        capsize=5,
-        capthick=2,
-        elinewidth=2,
-    )
-    data_plot_K_error.plot_error_cross(
-        markers_K_error,
-        0.01*time_at_markers_K_error,
-        0.003 * np.ones_like(markers_K_error),
-        0.01*time_std_at_markers_K_error,
-        fmt="o",
-        markersize=5,
-        capsize=5,
-        capthick=2,
-        elinewidth=2,
-        label='dual-EnKF'
-    )
+
+    # for prime_horizon in [3000, 5000, 7000, 9000, 10000]:
+    for prime_horizon in [3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]:
+
+        # Load data
+        neurips_data_directory_name = "neurips_data/prime_horizon_" + str(prime_horizon) + "/"
+        raw_data = RawData(directory_name=neurips_data_directory_name)
+
+        # Process data
+        data_K_error = raw_data.get_data(key="K_error", reverse=True)
+        K_error, time_K_error = data_K_error.get_average_time_curve(num=100)
+        markers_K_error = np.linspace(K_error[0], K_error[-1], num=7)[1:-1]
+        time_at_markers_K_error, time_std_at_markers_K_error = data_K_error.get_standard_deviation_time(markers_K_error)
+
+        data_cost = raw_data.get_data(key="cost", reverse=True)
+        cost, time_cost = data_cost.get_average_time_curve(num=100)
+        markers_cost = np.linspace(cost[0], cost[-1], num=7)[1:-1]
+        time_at_markers_cost, time_std_at_markers_cost = data_cost.get_standard_deviation_time(markers_cost)
+        print(K_error.shape)
+
+        # Plotting data
+        data_plot_K_error.plot_average_time_curve(
+            K_error,
+            time_K_error,
+            label=prime_horizon,
+        )
+        # data_plot_K_error.plot_error_bar(
+        #     markers_K_error,
+        #     time_at_markers_K_error,
+        #     time_std_at_markers_K_error,
+        #     fmt="o",
+        #     markersize=5,
+        #     capsize=5,
+        #     capthick=2,
+        #     elinewidth=2,
+        # )
+        data_plot_cost.plot_average_time_curve(
+            cost,
+            time_cost,
+            label=prime_horizon,
+        )
+        # data_plot_cost.plot_error_bar(
+        #     markers_cost,
+        #     time_at_markers_cost,
+        #     time_std_at_markers_cost,
+        #     fmt="o",
+        #     markersize=5,
+        #     capsize=5,
+        #     capthick=2,
+        #     elinewidth=2,
+        # )
+
     data_plot_K_error.set_plot_settings(
         xlabel="normalized error", 
         ylabel="time [sec]",
         xscale="linear",
         yscale="log",
     )
-
-    # Plotting data cost
-    data_plot_cost = DataPlot(
-        kwargs_figure=kwargs_figure, 
-        kwargs_axes=kwargs_axes,
-        kwargs_plots=kwargs_plots
-    )
-    data_plot_cost.plot_average_time_curve(
-        cost,
-        time_cost,
-        label='benchmark'
-    )
-    data_plot_cost.plot_error_bar(
-        markers_cost,
-        time_at_markers_cost,
-        time_std_at_markers_cost,
-        fmt="o",
-        markersize=5,
-        capsize=5,
-        capthick=2,
-        elinewidth=2,
-    )
-    data_plot_cost.plot_error_cross(
-        markers_cost,
-        0.01*time_at_markers_cost,
-        0.001 * np.ones_like(markers_cost),
-        0.01*time_std_at_markers_cost,
-        fmt="o",
-        markersize=5,
-        capsize=5,
-        capthick=2,
-        elinewidth=2,
-        label='dual-EnKF'
-    )
+    
     data_plot_cost.set_plot_settings(
         xlabel="normalized cost", 
         ylabel="time [sec]",
