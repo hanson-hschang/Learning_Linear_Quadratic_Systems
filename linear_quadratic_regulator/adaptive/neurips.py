@@ -331,7 +331,7 @@ for prime_horizon in [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500
         #     time_iterations[1:]
         # )
 
-        print("Saving benchmark file with ind = " + str(ind))
+        logging.info("Saving benchmark file with ind = " + str(ind))
         # benchmark algo list filenames
         data_file_name = neuirps_data_folder_directory + "Benjamin_ind_" + str(ind) + ".pk"
         
