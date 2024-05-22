@@ -1,4 +1,4 @@
-# Project Title
+# Learning Linear Quadratic Systems
 
 ## Introduction
 
@@ -22,8 +22,8 @@ You can install these packages using pip or conda.
 
 ## Usage
 
-### Linear Quadratic Gussian
-To run the linear quadratic gussian, navigate to the following directory and run the python script.
+### Linear Quadratic Gusasian
+To run the linear quadratic guassian, navigate to the following directory and run the python script.
 ```
 cd linear_quadratic_gussian/adaptive
 python neurips.py
