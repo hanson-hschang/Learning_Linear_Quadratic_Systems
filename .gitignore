@@ -1,10 +1,17 @@
 # Mac files
+.DS_Store
 **/.DS_Store
 .vscode/
 
 # Data files
 **/*.pk
 **/*.npy
+
+# Figures 
+*.png
+*.pdf
+*.jpeg
+*.jpg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
