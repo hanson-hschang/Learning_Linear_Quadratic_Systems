@@ -68,4 +68,4 @@ Some other simulated results may also found [here](https://drive.google.com/driv
 The results of the compared plots are shown below.
 |  LQG  |  LEQG  |
 |-------|--------|
-|![LQG_comparison](https://github.com/hanson-hschang/Learning_Linear_Quadratic_Systems/blob/main/figs/lqg_comparison.pdf)|![LEQG_comparison](https://github.com/hanson-hschang/Learning_Linear_Quadratic_Systems/blob/main/figs/leqg_comparison.pdf)|
+|![LQG_comparison](https://github.com/hanson-hschang/Learning_Linear_Quadratic_Systems/blob/main/figs/lqg_comparison.svg)|![LEQG_comparison](https://github.com/hanson-hschang/Learning_Linear_Quadratic_Systems/blob/main/figs/leqg_comparison.svg)|
