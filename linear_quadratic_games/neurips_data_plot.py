@@ -31,7 +31,7 @@ class Data:
     def get_standard_deviation_time(
         self,
         value: np.ndarray,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         interpolated_time = self.get_interpolated_time(value)
         time_average = np.mean(interpolated_time, axis=0)
         time_std = np.std(interpolated_time, axis=0)
