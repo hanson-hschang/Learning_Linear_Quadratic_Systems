@@ -51,7 +51,7 @@ smallfont = 18
 # PARAMETERS
 rng = np.random
 horizon = 100000
-trials_per_method = 100
+trials_per_method = 50
 
 def set_up_example(A_star, B_star, qr_ratio, prime_horizon, prime_excitation, sigma_excitation=0.1):
     n,p = B_star.shape
@@ -259,7 +259,12 @@ def calculate_K_error(Kt_iterations, K_inf):
 method = 'LSPI'
 prime_horizon = 7500
 
-for prime_horizon in [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]:
+for prime_horizon in [2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]:
+    print(
+        "start execution of {} prime horizon with {} many time trials".format(
+            prime_horizon, trials_per_method
+        )
+    )
     regrets = []
     errors = []
     costs = []
