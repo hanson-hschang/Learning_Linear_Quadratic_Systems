@@ -281,7 +281,7 @@ def create_neurips_lqg_plot(
     prime_horizon_list: list = [3000, 3500, 4000, 5000, 6000, 6500]
 ) -> None:
     
-    benchmark_directory_name = "linear_quadratic_regulator/adaptive/neurips_data/"
+    benchmark_directory_name = "linear_quadratic_guassian/adaptive/neurips_data/"
     neurips_data_selector = NeurIPSDataSelector(
         dual_enkf_file_name="neurips_data/3dstats10lyap.npy",
         # dual_enkf_file_name="neurips_data/3dstats100_linear_500_new_new.npy",

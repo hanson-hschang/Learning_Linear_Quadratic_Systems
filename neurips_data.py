@@ -223,7 +223,7 @@ def main():
     lqg_neurips_data_selector = NeurIPSDataSelector(
         dual_enkf_file_name="neurips_data/3dstats100.npy", # particals_list = [100, 500, 1000, 5000]
         cost_func="lqg",
-        benchmark_directory_name="linear_quadratic_regulator/adaptive/neurips_data/prime_horizon_5000/",
+        benchmark_directory_name="linear_quadratic_guassian/adaptive/neurips_data/prime_horizon_5000/",
         start_index=1,
     )
     lqg_data = load_data(
