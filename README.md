@@ -30,7 +30,7 @@ python neurips.py
 ```
 
 Note that the original main file is `regret_comparison.py`. 
-One may run this file to obtain result from original paper.
+One may run this file to obtain result from [original paper: Krauth *et. al.*, 2019](https://proceedings.neurips.cc/paper_files/paper/2019/hash/aaebdb8bb6b0e73f6c3c54a0ab0c6415-Abstract.html).
 
 The `neurips.py` file runs the simulation, save simulation information in the .log file and stored simulation data.
 
@@ -48,7 +48,7 @@ python sim_rum.py
 
 It runs the simulation, save simulation information in the .log file and stored simulation data.
 
-To plot the result for the original paper, run the following python script.
+To plot the result for the [original paper: Zhang *et. al.*, 2021](https://openreview.net/forum?id=NVAOPWZWYlv), run the following python script.
 ```
 python sim_plot.py
 ```
