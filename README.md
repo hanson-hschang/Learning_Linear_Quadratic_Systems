@@ -63,6 +63,9 @@ One may found the results of dual-EnKF results from [here](https://drive.google.
 python neurips_data_plot.py
 ```
 
-
 Some other simulated results may also found [here](https://drive.google.com/drive/folders/1h6lkcsROXrtMZp1lIEr1OHIs7166QX1H?usp=sharing).
- 
+
+The results of the compared plots are shown below.
+|  LQG  |  LEQG  |
+|-------|--------|
+|![LQG_comparison](https://github.com/hanson-hschang/Learning_Linear_Quadratic_Systems/blob/main/figs/lqg_comparison.pdf)|![LEQG_comparison](https://github.com/hanson-hschang/Learning_Linear_Quadratic_Systems/blob/main/figs/leqg_comparison.pdf)|
