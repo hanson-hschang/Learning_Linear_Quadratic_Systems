@@ -57,8 +57,8 @@ or run the other plotting file to have our preliminary neurips results.
 python sim_plot_result.py
 ```
 
-### Compared Plots with dual-EnKF
-One may found the results of dual-EnKF results from [here](https://drive.google.com/drive/folders/1tWFHcO6EF1lOcfO2MgSbyHYb9_Iy6xfT?usp=sharing). Please download the folder and place it directly under the main directory. Once its done, use the following command to plot the result.
+### Comparison Plots of dual-EnKF with others
+One may found the results of dual-EnKF algorithm from [here](https://drive.google.com/drive/folders/1tWFHcO6EF1lOcfO2MgSbyHYb9_Iy6xfT?usp=sharing). Please download the folder and place it directly under the main directory. Once its done, use the following command to plot the result.
 ```
 python neurips_data_plot.py
 ```
