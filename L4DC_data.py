@@ -141,7 +141,7 @@ def load_benchmark_data(
 def load_dual_enkf_data_from_folder(
     folder_name: str,
 ) -> NDArray[np.number]:
-    T=1 # [1, 10]
+    T = 1 # [1, 10]
     DIMX = 3
     NSIM = 10 
     a_stats = np.zeros((2,2,NSIM,4,2)) # lqg or leqg, deterministic or random, 

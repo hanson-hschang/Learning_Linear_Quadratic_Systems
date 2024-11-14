@@ -218,6 +218,7 @@ class L4DCDataPlot:
             # fancybox=True, 
             # shadow=True
         )
+        self.fig.tight_layout()
 
         ax.set_ylabel("Time (s)", fontsize=self.kwargs_plots["fontsize"], rotation='horizontal')
         ax.yaxis.set_label_coords(0., 1.05)
@@ -322,30 +323,44 @@ def create_l4dc_lqg_plot(
         # quit()
     
     l4dc_data_plot.set_axes()
-    virtual_ax = l4dc_data_plot.set_legend(
-        benchmark_label="[K19]",
-    )
 
-    min_cost_tick, max_cost_tick = 0.2, 3.0
+    min_cost_tick, max_cost_tick = 0.15, 3.0
     cost_tick_range = np.log10(max_cost_tick) - np.log10(min_cost_tick)
     min_cost_limit = min_cost_tick * (10**(-0.1*cost_tick_range))
     max_cost_limit = max_cost_tick * (10**(0.1*cost_tick_range))
     l4dc_data_plot.ax_cost.set_xlim(min_cost_limit, max_cost_limit)
-    l4dc_data_plot.ax_cost.set_xticks([min_cost_tick, 1.0, max_cost_tick])
-    l4dc_data_plot.ax_gain.set_xticks([7, 10, 20])
+    l4dc_data_plot.ax_cost.set_xticks([0.2, 1.0, max_cost_tick])
+   
     min_time_tick, max_time_tick = 0.01, 0.02
     time_tick_range = np.log10(max_time_tick) - np.log10(min_time_tick)
     min_time_limit = min_time_tick * (10**(-0.1*time_tick_range))
     max_time_limit = max_time_tick * (10**(0.1*time_tick_range))
     l4dc_data_plot.ax_cost.set_ylim(min_time_limit, max_time_limit)
     l4dc_data_plot.ax_cost.set_yticks([min_time_tick, max_time_tick])
+    
+    min_upper_time_tick, max_upper_time_tick = 0.7, 3.4
+    upper_time_tick_range = np.log10(max_upper_time_tick) - np.log10(min_upper_time_tick)
+    min_upper_time_limit = min_upper_time_tick * (10**(-0.1*upper_time_tick_range))
+    max_upper_time_limit = max_upper_time_tick * (10**(0.1*upper_time_tick_range))
+    l4dc_data_plot.ax_cost_upper.set_ylim(min_upper_time_limit, max_upper_time_limit)
     l4dc_data_plot.ax_cost_upper.set_yticks([0.7, 1., 3.])
+    
+    min_gain_tick, max_gain_tick = 7, 30
+    gain_tick_range = np.log10(max_gain_tick) - np.log10(min_gain_tick)
+    min_gain_limit = min_gain_tick * (10**(-0.1*gain_tick_range))
+    max_gain_limit = max_gain_tick * (10**(0.1*gain_tick_range))
+    l4dc_data_plot.ax_gain.set_xlim(min_gain_limit, max_gain_limit)
+    l4dc_data_plot.ax_gain.set_xticks([7, 10, 30])
+    
+    virtual_ax = l4dc_data_plot.set_legend(
+        benchmark_label="[K19]",
+    )
 
     arrow_direction = PlanarPoint(-0.2, 0.3)
     l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase particles",
-        PlanarPoint(0.3, 0.15),
+        PlanarPoint(0.35, 0.15),
         arrow_direction,
         text_offset_normal=-0.03,
         color=l4dc_data_plot.kwargs_plots["default_color"],
@@ -377,7 +392,6 @@ def create_l4dc_lqg_plot(
         color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
-    l4dc_data_plot.fig.tight_layout()
     l4dc_data_plot.fig.savefig("figs/lqg_comparison.pdf")
 
 def create_l4dc_leqg_plot(
@@ -400,7 +414,6 @@ def create_l4dc_leqg_plot(
     )
 
     l4dc_data_plot = L4DCDataPlot(data=data, init_plot=False, broken_axis=True)
-
 
     cost_final_index = find_indices(data.benchmark.cost, maximum_benchmark_cost)
     cost_indices = find_indices(
@@ -439,14 +452,12 @@ def create_l4dc_leqg_plot(
 
     
     l4dc_data_plot.set_axes()
-    virtual_ax = l4dc_data_plot.set_legend(
-        benchmark_label="[Z21]",
-    )
 
-    # l4dc_data_plot.ax_cost.set_yticks([0.07, 0.1])
-    l4dc_data_plot.ax_cost_upper.set_yticks([3600, 7200])
-    # neurips_data_plot.ax_cost_upper.set_yticks([60, 1000, 3600])
-    l4dc_data_plot.ax_gain.set_xticks([1, 10, 100])
+    min_cost_tick, max_cost_tick = 1.0, 10.0
+    cost_tick_range = np.log10(max_cost_tick) - np.log10(min_cost_tick)
+    min_cost_limit = min_cost_tick * (10**(-0.1*cost_tick_range))
+    max_cost_limit = max_cost_tick * (10**(0.1*cost_tick_range))
+    l4dc_data_plot.ax_cost.set_xlim(min_cost_limit, max_cost_limit)
 
     min_time_tick, max_time_tick = 0.01, 0.02
     time_tick_range = np.log10(max_time_tick) - np.log10(min_time_tick)
@@ -455,9 +466,23 @@ def create_l4dc_leqg_plot(
     l4dc_data_plot.ax_cost.set_ylim(min_time_limit, max_time_limit)
     l4dc_data_plot.ax_cost.set_yticks([min_time_tick, max_time_tick])
 
-    xlim = l4dc_data_plot.ax_gain.get_xlim()
-    xlim = (0.91, xlim[1])
-    l4dc_data_plot.ax_gain.set_xlim(xlim)
+    min_upper_time_tick, max_upper_time_tick = 3000, 9000
+    upper_time_tick_range = np.log10(max_upper_time_tick) - np.log10(min_upper_time_tick)
+    min_upper_time_limit = min_upper_time_tick * (10**(-0.1*upper_time_tick_range))
+    max_upper_time_limit = max_upper_time_tick * (10**(0.1*upper_time_tick_range))
+    l4dc_data_plot.ax_cost_upper.set_ylim(min_upper_time_limit, max_upper_time_limit)
+    l4dc_data_plot.ax_cost_upper.set_yticks([3600, 7200])
+
+    min_gain_tick, max_gain_tick = 1.5, 70
+    gain_tick_range = np.log10(max_gain_tick) - np.log10(min_gain_tick)
+    min_gain_limit = min_gain_tick * (10**(-0.1*gain_tick_range))
+    max_gain_limit = max_gain_tick * (10**(0.1*gain_tick_range))
+    l4dc_data_plot.ax_gain.set_xlim(min_gain_limit, max_gain_limit)
+    l4dc_data_plot.ax_gain.set_xticks([2.0, 10.0, 60.0])
+
+    virtual_ax = l4dc_data_plot.set_legend(
+        benchmark_label="[Z21]",
+    )
 
     arrow_direction = PlanarPoint(-0.2, 0.3)
     l4dc_data_plot.add_arrow_with_text(
@@ -495,7 +520,6 @@ def create_l4dc_leqg_plot(
         color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
-    l4dc_data_plot.fig.tight_layout()
     l4dc_data_plot.fig.savefig("figs/leqg_comparison.pdf")
 
 def main() -> None:
