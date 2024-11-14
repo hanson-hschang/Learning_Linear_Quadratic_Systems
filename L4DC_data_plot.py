@@ -1,6 +1,4 @@
 
-from typing import NamedTuple
-# from cvxpy import pos
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,10 +8,10 @@ matplotlib.rcParams.update({'text.usetex': True})
 matplotlib.rcParams.update({'font.family': 'serif'})
 import matplotlib.patches as mpatches
 
-from neurips_data import load_data, NeurIPSData, NeurIPSDataSelector, find_indices
+from L4DC_data import load_data, L4DCData, L4DCDataSelector, find_indices
 
 class PlanarPoint:
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float) -> None:
         self.x = x
         self.y = y
         self.r = np.sqrt(self.x**2 + self.y**2)
@@ -37,10 +35,10 @@ class PolarPoint(PlanarPoint):
         theta = theta / 180 * np.pi
         super().__init__(r*np.cos(theta), r*np.sin(theta))
 
-class NeurIPSDataPlot:
+class L4DCDataPlot:
     def __init__(
         self, 
-        data: NeurIPSData, 
+        data: L4DCData, 
         init_plot: bool = True,
         broken_axis: bool = False,
     ):
@@ -220,7 +218,6 @@ class NeurIPSDataPlot:
             # fancybox=True, 
             # shadow=True
         )
-        plt.tight_layout()
 
         ax.set_ylabel("Time (s)", fontsize=self.kwargs_plots["fontsize"], rotation='horizontal')
         ax.yaxis.set_label_coords(0., 1.05)
@@ -277,47 +274,45 @@ def get_aspect(ax: plt.Axes = None) -> float:
 
     return aspect
 
-def create_neurips_lqg_plot(
+def create_l4dc_lqg_plot(
     prime_horizon_list: list = [3000, 3500, 4000, 5000, 6000, 6500]
 ) -> None:
     
     benchmark_directory_name = "linear_quadratic_guassian/adaptive/neurips_data/"
-    neurips_data_selector = NeurIPSDataSelector(
-        dual_enkf_file_name="neurips_data/3dstats10lyap.npy",
-        # dual_enkf_file_name="neurips_data/3dstats100_linear_500_new_new.npy",
-        # dual_enkf_file_name="neurips_data/3dstats100_linear_100.npy",
+    l4dc_data_selector = L4DCDataSelector(
+        dual_enkf_folder_name="L4DC_data/Results",
         cost_func="lqg",
         benchmark_directory_name=benchmark_directory_name+"prime_horizon_{}/".format(prime_horizon_list[0]),
-        # selected_particles=None,
-        selected_particles=np.ix_([0, 3, 5, 6, 7, 8]), 
+        selected_particles=None,
+        # selected_particles=np.ix_([0, 3, 5, 6, 7, 8]), 
         start_index=50,
     )
     data=load_data(
-        neurips_data_selector=neurips_data_selector,
+        l4dc_data_selector=l4dc_data_selector,
     )
 
-    neurips_data_plot = NeurIPSDataPlot(data=data, init_plot=False, broken_axis=True)
+    l4dc_data_plot = L4DCDataPlot(data=data, init_plot=False, broken_axis=True)
 
     for prime_horizon in prime_horizon_list:
-        neurips_data_selector = neurips_data_selector._replace(
+        l4dc_data_selector = l4dc_data_selector._replace(
             benchmark_directory_name=benchmark_directory_name+"prime_horizon_{}/".format(prime_horizon)
         )
         data=load_data(
-            neurips_data_selector=neurips_data_selector,
+            l4dc_data_selector=l4dc_data_selector,
         )
-        neurips_data_plot.scatter_time_errorbar(
-            neurips_data_plot.ax_cost_upper,
+        l4dc_data_plot.scatter_time_errorbar(
+            l4dc_data_plot.ax_cost_upper,
             data.benchmark.cost[0],
             data.benchmark.time_cost[0],
             data.benchmark.time_std_cost[0],
-            color=neurips_data_plot.kwargs_plots["std_color"],
+            color=l4dc_data_plot.kwargs_plots["std_color"],
         )
-        neurips_data_plot.scatter_time_errorbar(
-            neurips_data_plot.ax_gain_upper,
+        l4dc_data_plot.scatter_time_errorbar(
+            l4dc_data_plot.ax_gain_upper,
             data.benchmark.K_error[0],
             data.benchmark.time_K_error[0],
             data.benchmark.time_std_K_error[0],
-            color=neurips_data_plot.kwargs_plots["std_color"],
+            color=l4dc_data_plot.kwargs_plots["std_color"],
         )
         # print(
         #     r"& %d & %.3f & %.3f & %.3f & %.3f & %.3f & %.3f \\ \cline{2-8}" 
@@ -326,75 +321,85 @@ def create_neurips_lqg_plot(
         # )
         # quit()
     
-    neurips_data_plot.set_axes()
-    virtual_ax = neurips_data_plot.set_legend(
+    l4dc_data_plot.set_axes()
+    virtual_ax = l4dc_data_plot.set_legend(
         benchmark_label="[K19]",
     )
 
-    neurips_data_plot.ax_cost.set_xticks([0.6, 1, 3])
-    neurips_data_plot.ax_gain.set_xticks([7, 10, 20])
-    neurips_data_plot.ax_cost.set_yticks([0.08, 0.1])
-    neurips_data_plot.ax_cost_upper.set_yticks([0.7, 1., 3.])
+    min_cost_tick, max_cost_tick = 0.2, 3.0
+    cost_tick_range = np.log10(max_cost_tick) - np.log10(min_cost_tick)
+    min_cost_limit = min_cost_tick * (10**(-0.1*cost_tick_range))
+    max_cost_limit = max_cost_tick * (10**(0.1*cost_tick_range))
+    l4dc_data_plot.ax_cost.set_xlim(min_cost_limit, max_cost_limit)
+    l4dc_data_plot.ax_cost.set_xticks([min_cost_tick, 1.0, max_cost_tick])
+    l4dc_data_plot.ax_gain.set_xticks([7, 10, 20])
+    min_time_tick, max_time_tick = 0.01, 0.02
+    time_tick_range = np.log10(max_time_tick) - np.log10(min_time_tick)
+    min_time_limit = min_time_tick * (10**(-0.1*time_tick_range))
+    max_time_limit = max_time_tick * (10**(0.1*time_tick_range))
+    l4dc_data_plot.ax_cost.set_ylim(min_time_limit, max_time_limit)
+    l4dc_data_plot.ax_cost.set_yticks([min_time_tick, max_time_tick])
+    l4dc_data_plot.ax_cost_upper.set_yticks([0.7, 1., 3.])
 
     arrow_direction = PlanarPoint(-0.2, 0.3)
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase particles",
         PlanarPoint(0.3, 0.15),
         arrow_direction,
         text_offset_normal=-0.03,
-        color=neurips_data_plot.kwargs_plots["default_color"],
+        color=l4dc_data_plot.kwargs_plots["default_color"],
     )
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase horizon",
         PlanarPoint(0.35, 0.5),
         arrow_direction,
         text_offset_normal=0.03,
         text_offset_direction=-0.02,
-        color=neurips_data_plot.kwargs_plots["std_color"],
+        color=l4dc_data_plot.kwargs_plots["std_color"],
     )
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase particles",
         PlanarPoint(0.9, 0.15),
         arrow_direction,
         text_offset_normal=-0.03,
-        color=neurips_data_plot.kwargs_plots["default_color"],
+        color=l4dc_data_plot.kwargs_plots["default_color"],
     )
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase horizon",
         PlanarPoint(0.9, 0.5),
         arrow_direction,
         text_offset_normal=0.03,
         text_offset_direction=-0.02,
-        color=neurips_data_plot.kwargs_plots["std_color"],
+        color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
-    neurips_data_plot.fig.savefig("figs/lqg_comparison.pdf")
+    l4dc_data_plot.fig.tight_layout()
+    l4dc_data_plot.fig.savefig("figs/lqg_comparison.pdf")
 
-def create_neurips_leqg_plot(
+def create_l4dc_leqg_plot(
     number_of_results: int = 6,
     maximum_benchmark_cost: float = 0.1,
     maximum_benchmark_K_error: float = 0.6,
 ) -> None:
     
-    neurips_data_selector = NeurIPSDataSelector(
-        # dual_enkf_file_name="neurips_data/3dstats10.npy",
-        dual_enkf_file_name="neurips_data/3dstats10lyap.npy",
+    l4dc_data_selector = L4DCDataSelector(
+        dual_enkf_folder_name="L4DC_data/Results",
         cost_func="leqg",
         benchmark_directory_name="linear_quadratic_games/neurips_data/",
-        # selected_particles=None,
+        selected_particles=None,
         # selected_particles=np.ix_([0, 3, 5, 6, 7, 8]),
-        selected_particles=np.ix_([0, 1, 5, 6, 7, 8]),
+        # selected_particles=np.ix_([0, 1, 5, 6, 7, 8]),
         start_index=10,
     )
     data=load_data(
-        neurips_data_selector=neurips_data_selector,
+        l4dc_data_selector=l4dc_data_selector,
     )
 
-    neurips_data_plot = NeurIPSDataPlot(data=data, init_plot=False, broken_axis=True)
+    l4dc_data_plot = L4DCDataPlot(data=data, init_plot=False, broken_axis=True)
 
 
     cost_final_index = find_indices(data.benchmark.cost, maximum_benchmark_cost)
@@ -402,12 +407,12 @@ def create_neurips_leqg_plot(
         data.benchmark.cost,
         np.linspace(data.benchmark.cost[0], data.benchmark.cost[cost_final_index], number_of_results)
     )
-    neurips_data_plot.scatter_time_errorbar(
-        neurips_data_plot.ax_cost_upper,
+    l4dc_data_plot.scatter_time_errorbar(
+        l4dc_data_plot.ax_cost_upper,
         data.benchmark.cost[cost_indices],
         data.benchmark.time_cost[cost_indices],
         data.benchmark.time_std_cost[cost_indices],
-        color=neurips_data_plot.kwargs_plots["std_color"],
+        color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
     gain_final_index = find_indices(data.benchmark.K_error, maximum_benchmark_K_error)
@@ -415,12 +420,12 @@ def create_neurips_leqg_plot(
         data.benchmark.K_error,
         np.linspace(data.benchmark.K_error[0], data.benchmark.K_error[gain_final_index], number_of_results)
     )
-    neurips_data_plot.scatter_time_errorbar(
-        neurips_data_plot.ax_gain_upper,
+    l4dc_data_plot.scatter_time_errorbar(
+        l4dc_data_plot.ax_gain_upper,
         data.benchmark.K_error[gain_indices],
         data.benchmark.time_K_error[gain_indices],
         data.benchmark.time_std_K_error[gain_indices],
-        color=neurips_data_plot.kwargs_plots["std_color"],
+        color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
     # for i in range(number_of_results):
@@ -433,61 +438,70 @@ def create_neurips_leqg_plot(
     # quit()
 
     
-    neurips_data_plot.set_axes()
-    virtual_ax = neurips_data_plot.set_legend(
+    l4dc_data_plot.set_axes()
+    virtual_ax = l4dc_data_plot.set_legend(
         benchmark_label="[Z21]",
     )
 
-    neurips_data_plot.ax_cost.set_yticks([0.07, 0.1])
-    neurips_data_plot.ax_cost_upper.set_yticks([3600, 7200])
+    # l4dc_data_plot.ax_cost.set_yticks([0.07, 0.1])
+    l4dc_data_plot.ax_cost_upper.set_yticks([3600, 7200])
     # neurips_data_plot.ax_cost_upper.set_yticks([60, 1000, 3600])
-    neurips_data_plot.ax_gain.set_xticks([1, 10, 100])
-    xlim = neurips_data_plot.ax_gain.get_xlim()
+    l4dc_data_plot.ax_gain.set_xticks([1, 10, 100])
+
+    min_time_tick, max_time_tick = 0.01, 0.02
+    time_tick_range = np.log10(max_time_tick) - np.log10(min_time_tick)
+    min_time_limit = min_time_tick * (10**(-0.1*time_tick_range))
+    max_time_limit = max_time_tick * (10**(0.1*time_tick_range))
+    l4dc_data_plot.ax_cost.set_ylim(min_time_limit, max_time_limit)
+    l4dc_data_plot.ax_cost.set_yticks([min_time_tick, max_time_tick])
+
+    xlim = l4dc_data_plot.ax_gain.get_xlim()
     xlim = (0.91, xlim[1])
-    neurips_data_plot.ax_gain.set_xlim(xlim)
+    l4dc_data_plot.ax_gain.set_xlim(xlim)
 
     arrow_direction = PlanarPoint(-0.2, 0.3)
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase particles",
         PlanarPoint(0.4, 0.15),
         arrow_direction,
         text_offset_normal=-0.03,
-        color=neurips_data_plot.kwargs_plots["default_color"],
+        color=l4dc_data_plot.kwargs_plots["default_color"],
     )
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase iterations",
         PlanarPoint(0.3, 0.6),
         arrow_direction,
         text_offset_normal=0.03,
         text_offset_direction=-0.02,
-        color=neurips_data_plot.kwargs_plots["std_color"],
+        color=l4dc_data_plot.kwargs_plots["std_color"],
     )
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase particles",
         PlanarPoint(0.7, 0.1),
         PolarPoint(arrow_direction.get_length(), 100),
         text_offset_normal=-0.03,
-        color=neurips_data_plot.kwargs_plots["default_color"],
+        color=l4dc_data_plot.kwargs_plots["default_color"],
     )
-    neurips_data_plot.add_arrow_with_text(
+    l4dc_data_plot.add_arrow_with_text(
         virtual_ax,
         "increase iterations",
         PlanarPoint(0.85, 0.55),
         PolarPoint(arrow_direction.get_length(), 100),
         text_offset_normal=0.03,
         text_offset_direction=-0.02,
-        color=neurips_data_plot.kwargs_plots["std_color"],
+        color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
-    neurips_data_plot.fig.savefig("figs/leqg_comparison.pdf")
+    l4dc_data_plot.fig.tight_layout()
+    l4dc_data_plot.fig.savefig("figs/leqg_comparison.pdf")
 
-def main():
+def main() -> None:
     
-    create_neurips_lqg_plot()
-    create_neurips_leqg_plot()
+    create_l4dc_lqg_plot()
+    create_l4dc_leqg_plot()
 
     plt.show()    
 
