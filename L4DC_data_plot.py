@@ -104,7 +104,9 @@ class L4DCDataPlot:
         kwargs.setdefault("elinewidth", 1)
 
         ax.errorbar(
-            value*self.ratio_to_percentage, time_mean, yerr=time_std, 
+            value*self.ratio_to_percentage, 
+            time_mean, 
+            yerr=time_std, 
             **kwargs,
         )
 
@@ -196,7 +198,7 @@ class L4DCDataPlot:
         )
         self.fig.tight_layout()
 
-        ax.set_ylabel("Time (s)", fontsize=self.kwargs_plots["fontsize"], rotation='horizontal')
+        ax.set_ylabel("time (s)", fontsize=self.kwargs_plots["fontsize"], rotation='horizontal')
         ax.yaxis.set_label_coords(0., 1.05)
         self.fig.subplots_adjust(hspace=0.05)  # adjust space between Axes
         return ax
@@ -496,7 +498,7 @@ def create_l4dc_leqg_plot(
         color=l4dc_data_plot.kwargs_plots["std_color"],
     )
 
-    l4dc_data_plot.fig.savefig("figs/leqg_comparison.pdf")
+    l4dc_data_plot.fig.savefig("figs/leqg_comparison.pdf", dpi=300)
 
 def main() -> None:
     

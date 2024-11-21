@@ -1,10 +1,14 @@
+
+from math import cos
 import os
 import pickle
 from re import L
+from tkinter import N
 import h5py
 import numpy as np
 from numpy.typing import NDArray
-from typing import Literal, NamedTuple, List, Any, Optional
+from typing import Literal, NamedTuple, List, Any, Optional, Tuple
+
 
 class Data:
     def __init__(self, value: np.ndarray, time: np.ndarray) -> None:
@@ -51,57 +55,74 @@ class Data:
         return interpolated_time
 
 class RawData:
-    def __init__(self, directory_name: str):
+    def __init__(
+        self, 
+        directory_name: str,
+        number_of_masses: List[int],
+        number_of_particles: List[int],
+    ) -> None:
         self.directory_name = directory_name
-        self.list_of_names_of_data_files = sorted([name for name in os.listdir(directory_name) if ".pk" in name])
-        self.number_of_data_files = len(self.list_of_names_of_data_files)
-        self.raw_data: List[Any] = [None] * self.number_of_data_files
+        self.number_of_masses = number_of_masses
+        self.number_of_particles = number_of_particles
+        
+        self.list_of_names_of_data_folders = []
+        self.cost_data = []
+        self.time_data = []
+        for number_of_mass in self.number_of_masses:
+            self.list_of_names_of_data_folders.append([])
+            self.cost_data.append([])
+            self.time_data.append([])
+            for number_of_particle in self.number_of_particles:
+                self.list_of_names_of_data_folders[-1].append(
+                    f"mppi_masses_{number_of_mass}_particles_{number_of_particle}"
+                )
+                self.cost_data[-1].append([])
+                self.time_data[-1].append([])
+        # self.cost_data: List[Any] = [None] * self.number_of_data_files
+
         self.load_data()
 
-        self.data_points_length = self.raw_data[0]["benchmark_time"].shape[0]
+        # self.data_points_length = self.raw_data[0]["benchmark_time"].shape[0]
 
-        self.benchmark_time = np.zeros((self.number_of_data_files, self.data_points_length))
-        self.benchmark_normalized_K_error = np.zeros((self.number_of_data_files, self.data_points_length))
-        self.benchmark_normalized_cost = np.zeros((self.number_of_data_files, self.data_points_length))
+        # self.benchmark_time = np.zeros((self.number_of_data_files, self.data_points_length))
+        # self.benchmark_normalized_K_error = np.zeros((self.number_of_data_files, self.data_points_length))
+        # self.benchmark_normalized_cost = np.zeros((self.number_of_data_files, self.data_points_length))
 
-        for file_count, data in enumerate(self.raw_data):
-            self.benchmark_time[file_count] = data["benchmark_time"]
-            self.benchmark_normalized_K_error[file_count] = data["benchmark_normalized_K_error"]
-            self.benchmark_normalized_cost[file_count] = data["benchmark_normalized_cost"]
+        # for file_count, data in enumerate(self.raw_data):
+        #     self.benchmark_time[file_count] = data["benchmark_time"]
+        #     self.benchmark_normalized_K_error[file_count] = data["benchmark_normalized_K_error"]
+        #     self.benchmark_normalized_cost[file_count] = data["benchmark_normalized_cost"]
 
     def load_data(self,) -> None:
-        for file_count, data_file_name in enumerate(self.list_of_names_of_data_files):
-            data_file = open(self.directory_name+data_file_name, "rb")
-            self.raw_data[file_count] = pickle.load(data_file)
+        for i, number_of_mass in enumerate(self.number_of_masses):
+            for j, number_of_particle in enumerate(self.number_of_particles):
+                data_folder_name = self.list_of_names_of_data_folders[i][j]
+                h5py_file = h5py.File(self.directory_name + "/" + data_folder_name +"/cost.hdf5", "r")
+                time: NDArray = h5py_file["time"]
+                cost: NDArray = h5py_file["cost"]
+                number_of_systems = cost.shape[0]
+                time_step = np.mean(np.diff(time))
+                cost_cumsum = np.cumsum(cost, axis=1) * time_step
+                average_cost = cost_cumsum[:, -1] / time[-1]
+                optimal_cost = h5py_file.attrs["optimal_cost"]
+                self.cost_data[i][j] = (average_cost-optimal_cost)/optimal_cost
+                self.time_data[i][j] = h5py_file.attrs["execution_time (sec)"] / number_of_systems
+        self.cost_data = np.array(self.cost_data)
+        self.time_data = np.array(self.time_data)
 
     def get_data(
         self, 
-        key: Literal["K_error", "cost"], 
-        reverse: bool = False, 
-        start_index: int = 1
-    ) -> Data:
-        data_time = self.benchmark_time[:, start_index:]
-        match key:
-            case "K_error":
-                data_value = self.benchmark_normalized_K_error[:, start_index:]
-            case "cost":
-                data_value = self.benchmark_normalized_cost[:, start_index:]
-            case _:
-                raise ValueError("Invalid key")
+    ) -> Tuple[NDArray, NDArray, NDArray]:
         
-        if reverse:
-            data_value = data_value[:, ::-1]
-            data_time = data_time[:, ::-1]
-        
-        return Data(
-            value=data_value, 
-            time=data_time
-        )
+        cost_mean = np.mean(self.cost_data, axis=2)
+        cost_std = np.std(self.cost_data, axis=2)
+        time_data = np.array(self.time_data)
+        return cost_mean, cost_std, time_data
 
 class BenchmarkData(NamedTuple):
-    cost: np.ndarray
+    cost_mean: np.ndarray
+    cost_std: np.ndarray
     time_cost: np.ndarray
-    time_std_cost: np.ndarray
 
 class DualEnKFData(NamedTuple):
     time_mean: np.ndarray
@@ -117,17 +138,19 @@ class L4DCData(NamedTuple):
 
 def load_benchmark_data(
     directory_name: str,
-    interpotate_num: int = 400,
+    number_of_masses: List = [5, 10, 20],
+    number_of_particles: List = [10, 50, 100, 500],
 ) -> BenchmarkData:
-    benchmark_raw_data = RawData(directory_name=directory_name)
+    benchmark_raw_data = RawData(
+        directory_name=directory_name,
+        number_of_masses=number_of_masses,
+        number_of_particles=number_of_particles,
+    )
 
     # Process data
-    data_cost = benchmark_raw_data.get_data(key="cost", reverse=True)
-    cost, time_cost, time_std_cost = data_cost.get_time_curve(num=interpotate_num)
-    # time_at_markers_cost, time_std_at_markers_cost = data_cost.get_standard_deviation_time(markers_cost)
-    
+    cost_mean, cost_std, time_cost = benchmark_raw_data.get_data()
     return BenchmarkData(
-        cost, time_cost, time_std_cost
+        cost_mean, cost_std, time_cost
     )
 
 def load_dual_enkf_data_from_folder(
@@ -192,10 +215,10 @@ def load_data(
         selected_particles=l4dc_data_selector.selected_particles,
     )
 
-    # benchmark_data = load_benchmark_data(
-    #     directory_name=l4dc_data_selector.benchmark_directory_name,
-    # )
-    return L4DCData(dula_enkf_data, None)
+    benchmark_data = load_benchmark_data(
+        directory_name=l4dc_data_selector.benchmark_directory_name,
+    )
+    return L4DCData(dula_enkf_data, benchmark_data)
 
 def load_smd_data(
     file_name: str,
