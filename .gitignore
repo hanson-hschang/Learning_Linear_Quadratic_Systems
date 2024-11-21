@@ -6,6 +6,7 @@
 # Data files
 **/*.pk
 **/*.npy
+*.hdf5
 
 # Figures 
 *.png

@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 import numpy as np
+from scipy.linalg import solve_continuous_are
 from tqdm import tqdm
 from time import perf_counter
 
@@ -26,13 +27,13 @@ from ss.system.state_vector.examples.mass_spring_damper import (
 @click.option(
     "--simulation-time",
     type=click.FloatRange(min=0),
-    default=1.0,
+    default=10.0,
     help="Set the simulation time (positive value).",
 )
 @click.option(
     "--time-step",
     type=click.FloatRange(min=0),
-    default=0.02,
+    default=0.1,
     help="Set the time step (positive value).",
 )
 @click.option(
@@ -44,8 +45,14 @@ from ss.system.state_vector.examples.mass_spring_damper import (
 @click.option(
     "--number-of-systems",
     type=click.IntRange(min=1),
-    default=1,
+    default=15,
     help="Set the number of systems (positive integers).",
+)
+@click.option(
+    "--number-of-samples",
+    type=click.IntRange(min=1),
+    default=1000,
+    help="Set the number of samples (positive integers).",
 )
 def main(
     number_of_connections: int,
@@ -53,6 +60,7 @@ def main(
     time_step: float,
     step_skip: int,
     number_of_systems: int,
+    number_of_samples: int,
 ) -> None:
     simulation_time_steps = int(simulation_time / time_step)
     system = MassSpringDamperSystem(
@@ -85,9 +93,19 @@ def main(
         system=system,
         cost=cost,
         time_horizon=100,
-        number_of_samples=1000,
+        number_of_samples=number_of_samples,
         temperature=100.0,
         base_control_confidence=0.98,
+    )
+
+    are_solution_inf = solve_continuous_are(
+        a=system.state_space_matrix_A,
+        b=system.state_space_matrix_B,
+        q=cost.running_cost_state_weight,
+        r=cost.running_cost_control_weight,
+    )
+    optimal_cost = np.trace(
+        are_solution_inf @ system.process_noise_covariance
     )
 
     start_time = perf_counter()
@@ -134,6 +152,7 @@ def main(
             "number_of_connections" : number_of_connections,
             "simulation_time (sec)" : simulation_time,
             "time_step (sec)" : time_step,
+            "optimal_cost" : optimal_cost,
         }
     )
 
