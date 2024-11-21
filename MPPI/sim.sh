@@ -2,7 +2,7 @@
 
 # Parameter arrays
 connections=(20 10 5)
-particle_counts=(5000 1000 500 100)
+particle_counts=(500 100 50 10)
 
 # Loop through all combinations
 for conn in "${connections[@]}"; do
