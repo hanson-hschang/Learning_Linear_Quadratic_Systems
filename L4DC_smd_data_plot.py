@@ -114,6 +114,7 @@ class L4DCDataPlot:
         ax.tick_params(axis="both", labelsize=self.kwargs_plots["fontsize"])
         ax.set_xscale("log")
         ax.set_yscale("log")
+        ax.grid(which="both", linestyle="--", linewidth=0.5)
 
     def set_legend(self) -> None:
         kwargs = {
